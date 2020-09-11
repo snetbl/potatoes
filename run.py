@@ -137,7 +137,7 @@ def conf_cmp_potatoes_f():
         pot_mr = 2
         pot_rp = 2
     else:
-        pot_epochs = 5000
+        pot_epochs = 3000
         pot_loss_th = 0.005
         pot_ep_th = {50: 0.015, 100: 0.008, 740: 0.008, 1490: 0.008}
         pot_mr = 10
