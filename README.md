@@ -35,7 +35,7 @@ generatedData next to the datasets the evaluation was run on.
 
 To actually run the evaluation, type:
 
-$ python -c 'import run; run.cmp_save_potatoes_f()';
+$ python -c 'import run; run.cmp_save_potatoes_f()'
 
 This can be repeated with as many of the above generated OD datasets as you
 wish, each time changing in the configuration function conf_cmp_potatoes_f()
@@ -47,6 +47,6 @@ those csv files need to be concatenated to one large evaluation file, lets call
 it e.g. "all_evals.csv". Now, to obtain the box plot facets from the paper,
 run:
 
-$ python -c 'import run; run.plot_file("all_evals.csv", "eval summary")';
+$ python -c 'import run; run.plot_file("all_evals.csv", "eval summary")'
 
 
