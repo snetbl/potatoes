@@ -4,38 +4,30 @@
 
 from os.path import join as p_join, dirname, basename, splitext
 from sys import path as s_path, maxsize, argv, exit
-from pathlib import Path, PurePath
+from pathlib import Path
 s_path.append(p_join(str(Path(__file__).resolve().parents[0]), 'src'))
 
 import os
 import re
 
-from od_conf import GENDIR, DATASETDIR, DS_SUB_DIR, EVAL_SUB_DIR, DATE_TIME_FORMAT, IMG_SUB_DIR
+from od_conf import GENDIR, DATASETDIR, DS_SUB_DIR, EVAL_SUB_DIR, DATE_TIME_FORMAT
 
 import tensorflow as tf
 from tensorflow.keras.regularizers import l1, l2, l1_l2
-from tensorflow.keras.utils import normalize as keras_normalize
 import numpy as np
-from numpy import pi as pi
-from scipy.stats import ttest_rel, shapiro, kstest
 import pandas as pd
-from sklearn.preprocessing import scale
-import statsmodels.api as sm
 
-import seaborn as sns
-import matplotlib as mpl
 from matplotlib import pyplot as plt
 
 from datetime import datetime
-from pprint import pprint
 
-from od_models import iforest_problem, check_if_mnist, check_lof_mnist, check_ocsvm_mnist, ocsvm_mnist_tune, check_nnb_mnist, do_ova_eval, check_scae_mnist, check_cae_mnist, check_cae2_mnist,  ConvAe2, ConvAe3, FlatAeV, Aee, Aee2, RocAuc, OF1, Ode, KPr, Ap, OsQtl, Potatoes, PotEns, IfModel, OcsvmModel, EvalConf, CsOva, ep_str
+from od_models import  ConvAe2, Aee, RocAuc, OF1, Ode, KPr, Ap, Potatoes, PotEns, IfModel, OcsvmModel, EvalConf
 from od_tools import Mnist, FMnist, Cifar10, Sine, Sine50, SineRnd, BinData, CircleRnd
 from tools import ewedge
 
 def conf_cmp_potatoes_f():
-    test = True
-    #test = False
+    #test = True
+    test = False
 
     ###############################################################################
     # configuring the datasets
@@ -124,6 +116,55 @@ def conf_cmp_potatoes_f():
         ae_of_loss_th = 0.005
         ae_of_ep_th = {50: 0.01, 100: 0.008}
 
+    ############# aee ConvAe2 ##################
+    aee_aec = ConvAe2
+    aee_kregf = 1.e-4
+    aee_kreg = l2(aee_kregf)
+    aee_breg = None
+    aee_areg = None
+    aee_ld = 32
+    aee_k = 5
+    aee_efun = lambda l_ols: np.median(l_ols, axis = 0)
+    aee_efun.__name__ = "median"
+    aee_dot_iv = 100
+    aee_block_iv = 500
+    if test:
+        aee_epochs = 3
+        aee_loss_th = 1
+        aee_ep_th = {1: aee_loss_th}
+        aee_mr = 2
+    else:
+        aee_epochs = 750
+        aee_loss_th = 0.015
+        aee_ep_th = {10: .1, 50: 0.08}
+        aee_mr = 10
+
+    aee_ae_kwargs = {'ld': aee_ld, 'epochs': aee_epochs, 'kreg': aee_kreg, 'loss_th': aee_loss_th, 'vb': vb, 'ep_th': aee_ep_th, 'dot_iv': aee_dot_iv, 'block_iv': aee_block_iv}
+
+    ############# aee_of ConvAe2 ##################
+    aee_of_aec = ConvAe2
+    aee_of_kreg = None
+    aee_of_breg = None
+    aee_of_areg = None
+    aee_of_ld = 32
+    aee_of_k = 5
+    aee_of_efun = lambda l_ols: np.amax(l_ols, axis = 0)
+    aee_of_efun.__name__ = "amax"
+    aee_of_dot_iv = 100
+    aee_of_block_iv = 100
+    if test:
+        aee_of_epochs = 3
+        aee_of_loss_th = 1
+        aee_of_ep_th = {1: aee_of_loss_th}
+        aee_of_mr = 2
+    else:
+        aee_of_epochs = 2000
+        aee_of_loss_th = 0.015
+        aee_of_ep_th = {10: .1, 50: 0.08}
+        aee_of_mr = 10
+
+    aee_of_ae_kwargs = {'ld': aee_of_ld, 'epochs': aee_of_epochs, 'kreg': aee_of_kreg, 'loss_th': aee_of_loss_th, 'vb': vb, 'ep_th': aee_of_ep_th, 'dot_iv': aee_of_dot_iv, 'block_iv': aee_of_block_iv}
+
     ############# pot ConvAe2 ##################
     pot_aec = ConvAe2
     pot_ld = 32
@@ -145,6 +186,32 @@ def conf_cmp_potatoes_f():
 
     ae_kwargs = {'ld': pot_ld, 'epochs': pot_epochs, 'loss_th': pot_loss_th, 'vb': vb, 'ep_th': pot_ep_th, 'dot_iv': pot_dot_iv, 'block_iv': pot_block_iv}
 
+    ############# potatoes ensemble ##################
+    pens_aec = ConvAe2
+    pens_ld = 32
+    pens_efun = emed
+    pens_mr = 1
+    pens_dot_iv = dot_iv
+    pens_block_iv = block_iv
+    if test:
+        pens_k = 2
+        pens_s = 2
+        pens_epochs = 2
+        pens_loss_th = 1
+        pens_ep_th = {}
+        pens_pmr = 2
+        pens_prp = 2
+    else:
+        pens_k = 5
+        pens_s = 5
+        pens_epochs = 3000
+        pens_loss_th = 0.005
+        pens_ep_th = {50: 0.015, 100: 0.008}
+        pens_pmr = 10
+        pens_prp = 3
+
+    pens_kwargs = {'ld': pens_ld, 'epochs': pens_epochs, 'loss_th': pens_loss_th, 'vb': vb, 'ep_th': pens_ep_th, 'dot_iv': pens_dot_iv, 'block_iv': pens_block_iv}
+
     ############# if ##################
     if_ne = 500
     if_ms = 5000
@@ -162,10 +229,16 @@ def conf_cmp_potatoes_f():
             vb=vb, ep_th=ae_of_ep_th, dot_iv = ae_of_dot_iv, block_iv = ae_of_block_iv)
     pot = Potatoes(pot_aec, ae_kwargs, pot_k, mr = pot_mr, rp = pot_rp)
 
+    aee = Aee(aee_aec, aee_ae_kwargs, aee_k, mr = aee_mr, efun = aee_efun)
+    aee_of = Aee(aee_of_aec, aee_of_ae_kwargs, aee_of_k, mr = aee_of_mr, efun = aee_of_efun)
+    pens = PotEns(pens_aec, pens_kwargs, pens_k, pens_s, pens_efun, None, pens_pmr, pens_prp, pens_mr)
+
+
     ifor = IfModel(n_estimators = if_ne, max_samples = if_ms)
     ocsvm = OcsvmModel(gamma = oc_g, nu = oc_nu)
 
     odms = [ifor, ocsvm, ae_reg, pot]
+    #odms = [aee_of, aee, pens]
     odmss = "_".join([str(m) for m in odms])
 
     ###############################################################################

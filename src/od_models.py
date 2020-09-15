@@ -1043,6 +1043,9 @@ class SimpleConvAe(Ae):
 
 
 class ConvAe(Ae):
+    """ This model is inspired by the convolutional AE proposed in
+    https://www.tensorflow.org/guide/keras/functional#all_models_are_callable_just_like_layers
+    """
     def __init__(self, ld, epochs, name = None, kreg = None, breg = None,
             areg = None, loss_th = AELT, vb = 1, ep_th = {}, dot_iv = 1000,
             block_iv = 10000):
@@ -1137,6 +1140,9 @@ class ConvAe(Ae):
 
 
 class ConvAe2(Ae):
+    """ This model is inspired by the convolutional AE proposed in
+    https://www.tensorflow.org/guide/keras/functional#all_models_are_callable_just_like_layers
+    """
     def __init__(self, ld, epochs, name = None, kreg = None, breg = None,
             areg = None, loss_th = AELT, vb = 1, ep_th = {}, dot_iv = 1000,
             block_iv = 10000):
