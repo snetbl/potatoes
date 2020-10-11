@@ -1,5 +1,5 @@
 # POTATOES
-Here are the steps to follow to obtain the results from the paper "Anomaly
+Below you will find the steps to follow to obtain the results from the paper "Anomaly
 Detection With Partitioning Overfitting Autoencoder Ensembles" by Boris Lorbeer
 and Max Botler. This has only been used on ubuntu 18.04.
 
@@ -21,7 +21,7 @@ $ python -c 'import run; run.gen_small_mnist_files()'
 Next, the evaluation runs have to be configured. Since there are lots of
 configuration parameters, it doesn't make sense to enter them as function
 arguments, so there is a function template that contains a default
-configuration setting which can easily be changed by changing this code of this
+configuration setting which can easily be changed by changing the code of this
 function. The function is located in the run module and is called
 "conf_cmp_potatoes_f()". It will be called by the other functions below right
 after they start.
