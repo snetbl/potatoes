@@ -28,7 +28,7 @@ after they start.
 The default configuration in this function is running outlier detection on the
 dataset
 generatedData/datasets/ova_mnist_bc0_rm0.005_s10_0/data/ova_mnist_bc_0_rm0.005_000.npz
-with the models: Isolation Forest, One-Class SVM, regularized Auteencoder, and
+with the models: Isolation Forest, One-Class SVM, regularized Autoencoder, and
 POTATOES. The metrics used are ROC AUC, AP, OF1, and prec@20. All this can be
 changed in this configuration function. The evaluation results are saved under
 generatedData next to the datasets the evaluation was run on.
