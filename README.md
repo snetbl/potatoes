@@ -1,7 +1,7 @@
 # POTATOES
 Below you will find the steps to follow to obtain the results from the paper "Anomaly
-Detection With Partitioning Overfitting Autoencoder Ensembles" by Boris Lorbeer
-and Max Botler. This has only been used on ubuntu 18.04.
+Detection With Partitioning Overfitting Autoencoder Ensembles". This has only been
+used on ubuntu 18.04.
 
 After cloning the repository, you need to make sure that you have the necessary
 libraries installed. We use anaconda3 with tensorflow 2.
