@@ -25,38 +25,38 @@ from od_models import  ConvAe2, Aee, RocAuc, OF1, Ode, KPr, Ap, Potatoes, PotEns
 from od_tools import Mnist, FMnist, Cifar10, Sine, Sine50, SineRnd, BinData, CircleRnd
 from tools import ewedge
 
-def conf_cmp_potatoes_f():
-    #test = True
-    test = False
+def conf_cmp_potatoes_f(ds_col = None, test = False):
+    """This is the function containing all the configuration stuff.
+    """
+    if ds_col is None:
+        # configuring the datasets
+        if test:
+            #ds_col = "small_ova_mnist_bc0_rm0.01_s2_0"
+            ds_col = "ova_fmnist_bc0_rm0.005_s50_0"
+        else:
+            ds_col = "ova_mnist_bc0_rm0.005_s10_0"
+            #ds_col = "ova_mnist_bc0_rm0.005_s10_1"
+            #ds_col = "ova_mnist_bc0_rm0.005_s10_2"
+            #ds_col = "ova_mnist_bc0_rm0.005_s10_3"
+            #ds_col = "ova_mnist_bc0_rm0.005_s10_4"
 
-    ###############################################################################
-    # configuring the datasets
-    if test:
-        ds_col = "small_ova_mnist_bc0_rm0.01_s2_0"
-    else:
-        ds_col = "ova_mnist_bc0_rm0.005_s10_0"
-        #ds_col = "ova_mnist_bc0_rm0.005_s10_1"
-        #ds_col = "ova_mnist_bc0_rm0.005_s10_2"
-        #ds_col = "ova_mnist_bc0_rm0.005_s10_3"
-        #ds_col = "ova_mnist_bc0_rm0.005_s10_4"
+            #ds_col = "ova_mnist_bc1_rm0.005_s10_0"
+            #ds_col = "ova_mnist_bc1_rm0.005_s10_1"
+            #ds_col = "ova_mnist_bc1_rm0.005_s10_2"
+            #ds_col = "ova_mnist_bc1_rm0.005_s10_3"
+            #ds_col = "ova_mnist_bc1_rm0.005_s10_4"
 
-        #ds_col = "ova_mnist_bc1_rm0.005_s10_0"
-        #ds_col = "ova_mnist_bc1_rm0.005_s10_1"
-        #ds_col = "ova_mnist_bc1_rm0.005_s10_2"
-        #ds_col = "ova_mnist_bc1_rm0.005_s10_3"
-        #ds_col = "ova_mnist_bc1_rm0.005_s10_4"
+            #ds_col = "ova_fmnist_bc0_rm0.005_s10_0"
+            #ds_col = "ova_fmnist_bc0_rm0.005_s10_1"
+            #ds_col = "ova_fmnist_bc0_rm0.005_s10_2"
+            #ds_col = "ova_fmnist_bc0_rm0.005_s10_3"
+            #ds_col = "ova_fmnist_bc0_rm0.005_s10_4"
 
-        #ds_col = "ova_fmnist_bc0_rm0.005_s10_0"
-        #ds_col = "ova_fmnist_bc0_rm0.005_s10_1"
-        #ds_col = "ova_fmnist_bc0_rm0.005_s10_2"
-        #ds_col = "ova_fmnist_bc0_rm0.005_s10_3"
-        #ds_col = "ova_fmnist_bc0_rm0.005_s10_4"
-
-        #ds_col = "ova_fmnist_bc1_rm0.005_s10_0"
-        #ds_col = "ova_fmnist_bc1_rm0.005_s10_1"
-        #ds_col = "ova_fmnist_bc1_rm0.005_s10_2"
-        #ds_col = "ova_fmnist_bc1_rm0.005_s10_3"
-        #ds_col = "ova_fmnist_bc1_rm0.005_s10_4"
+            #ds_col = "ova_fmnist_bc1_rm0.005_s10_0"
+            #ds_col = "ova_fmnist_bc1_rm0.005_s10_1"
+            #ds_col = "ova_fmnist_bc1_rm0.005_s10_2"
+            #ds_col = "ova_fmnist_bc1_rm0.005_s10_3"
+            #ds_col = "ova_fmnist_bc1_rm0.005_s10_4"
 
     dn = p_join(DATASETDIR, ds_col, DS_SUB_DIR)
     bds = [BinData(ol_lab = 1, fn = p_join(dn, fn),
@@ -227,23 +227,25 @@ def conf_cmp_potatoes_f():
             dot_iv = ae_reg_dot_iv, block_iv = ae_reg_block_iv)
     ae_of = ae_of_c(ae_of_ld, ae_of_epochs, None, loss_th = ae_of_loss_th,
             vb=vb, ep_th=ae_of_ep_th, dot_iv = ae_of_dot_iv, block_iv = ae_of_block_iv)
-    pot = Potatoes(pot_aec, ae_kwargs, pot_k, mr = pot_mr, rp = pot_rp)
+    pot = Potatoes(pot_aec, ae_kwargs, pot_k, mr = pot_mr, rp = pot_rp, check_close_pairs = False)
 
     aee = Aee(aee_aec, aee_ae_kwargs, aee_k, mr = aee_mr, efun = aee_efun)
     aee_of = Aee(aee_of_aec, aee_of_ae_kwargs, aee_of_k, mr = aee_of_mr, efun = aee_of_efun)
     pens = PotEns(pens_aec, pens_kwargs, pens_k, pens_s, pens_efun, None, pens_pmr, pens_prp, pens_mr)
 
-
     ifor = IfModel(n_estimators = if_ne, max_samples = if_ms)
     ocsvm = OcsvmModel(gamma = oc_g, nu = oc_nu)
 
-    odms = [ifor, ocsvm, ae_reg, pot]
-    #odms = [aee_of, aee, pens]
+    #odms = [ifor, ocsvm, ae_reg, pot]
+    #odms = [ae_of, ae_reg, pot]
+    odms = [ae_reg, pot]
+    #odms = [aee_of, aee, pens, pot]
     odmss = "_".join([str(m) for m in odms])
 
     ###############################################################################
     # configuring the metrics
-    mets = [Ap(), RocAuc(), KPr(k=20), KPr(k=40), OF1()]
+    #mets = [Ap(), RocAuc(), KPr(k=20), KPr(k=40), OF1()]
+    mets = [Ap(), RocAuc(), KPr(k=20), OF1()]
     metss = "_".join([str(m) for m in mets])
 
     ###############################################################################
@@ -260,11 +262,11 @@ def conf_cmp_potatoes_f():
     return ecs, ds_col, csv_fn
 
 
-def cmp_save_potatoes_f():
+def cmp_save_potatoes_f(ds_col, test = False):
     start = datetime.now()
-    ecs, ds_col, csv_fn = conf_cmp_potatoes_f()
+    ecs, ds_col_r, csv_fn = conf_cmp_potatoes_f(ds_col, test)
 
-    dn = p_join(DATASETDIR, ds_col, EVAL_SUB_DIR)
+    dn = p_join(DATASETDIR, ds_col_r, EVAL_SUB_DIR)
     os.makedirs(dn, exist_ok = True)
     fn_fdf = p_join(dn, csv_fn)
 
@@ -276,6 +278,8 @@ def cmp_save_potatoes_f():
     print(f"\nevaluations will be written to:\n{fn_fdf}")
 
     df = Ode(ecs).eval_save(fn_fdf)
+    df[EvalConf.ODM_COL] = df[EvalConf.ODM_COL].astype(str)
+
     print(f"wrote file {fn_fdf}")
     Ode.print_df(df)
 
@@ -290,55 +294,135 @@ def plot_file(fn, title):
                  kind = "box",
                  col_wrap = 2,
                  height = 5,
-                 aspect = 3,
+                 aspect = 1,
                  title = title)
 
     print(fdf.head())
 
     plt.tight_layout()
-    plt.subplots_adjust(top = .92, left = .04, right = .9)
-    fn_plot = p_join(GENDIR, f"plot_{Path(fn).stem}.pdf")
+    plt.subplots_adjust(top = .92, left = .08, right = .88)
+    fn_plot = p_join(str(Path(fn).parent), f"plot_{Path(fn).stem}.pdf")
     f.savefig(fn_plot)
     print(f"saved plot to {fn_plot}")
     plt.show()
 
 ###############################################################################
 
-def gen_mnist_files(n_col = 5, bc = 0, rm = 0.005, n_s = 10):
-    """This generates npz files with Mnist OD datasets.
+def gen_data_files(ld, pre, bc, rm, n_s):
+    ds_col = f"{pre}_bc{bc}_rm{rm}_s{n_s}"
+    dn = p_join(DATASETDIR, ds_col, DS_SUB_DIR)
+    print(f"creating data {dn}")
+
+    # I know, this is not save...
+    if Path(dn).exists():
+        print(f"directory\n{dn}\nalready exists!")
+        print("Nothing to do, skipping data generation.")
+    else:
+        ld.npz_ova_bds(bc, rm, n_s, dn)
+
+    return ds_col
+
+
+def gen_mnist_files(bc = 0, rm = 0.005, n_s = 50):
+    """This generates npz files with Mnist OVA datasets. The generated datasets
+    have maximal size, i.e. it takes all benign digits available in the
+    dataset.
+    return: the subdirectory name under DATASETDIR containing all the n_s Mnist
+        OVA datasets created. In the default configuration, that would be
+        ova_mnist_bc0_rm0.005_s50
     """
-    for i in range(n_col):
-        dn = p_join(DATASETDIR,
-                    f"ova_mnist_bc{bc}_rm{rm}_s{n_s}_{i}",
-                    DS_SUB_DIR)
-        Mnist(flatten = False).npz_ova_bds(bc, rm, n_s, dn)
+    return gen_data_files(Mnist(flatten = False), "ova_mnist", bc, rm, n_s)
 
 
-def gen_small_mnist_files(n_col = 1, bc = 0, rm = 0.01, n_s = 2):
-    """This generates npz files with Mnist OD datasets.
+def gen_small_mnist_files(bc = 0, rm = 0.01, n_s = 5, tc = 0, ec = 2000):
+    """This generates npz files with Mnist OVA datasets. The generated datasets
+    contain only tc benign digits from the trainings portion and ec benign
+    digits from the evaluation portion of the dataset.
+
+    So the default of bc = 0, rm = 0.01, n_s = 5, tc = 0, ec = 2000, means
+    there will be no zeros from the trainings portion, 2000 zeros from the
+    evaluation portion, so 2000 zeros in total, i.e. 20 malign digits, and
+    five such dataset will be created.
+
+    return: the subdirectory name under DATASETDIR containing all the n_s Mnist
+        OVA datasets created. In the default configuration, that would be
+        small_ova_mnist_bc0_rm0.01_s5
     """
-    tc = 0
-    ec = 2000
-    for i in range(n_col):
-        dn = p_join(DATASETDIR,
-                    f"small_ova_mnist_bc{bc}_rm{rm}_s{n_s}_{i}",
-                    DS_SUB_DIR)
-        Mnist(t_count = tc, e_count = ec, flatten = False).\
-                npz_ova_bds(bc, rm, n_s, dn)
+    return gen_data_files(Mnist(t_count = tc, e_count = ec, flatten = False),
+                          "small_ova_mnist", bc, rm, n_s)
 
 
-def gen_fmnist_files(n_col = 5, bc = 0, rm = 0.005, n_s = 10):
-    """This generates npz files with FMnist OD datasets.
+def gen_fmnist_files(bc = 0, rm = 0.005, n_s = 50):
+    """This generates npz files with FMnist OVA datasets. The generated
+    datasets have maximal size, i.e. it takes all benign digits available in
+    the dataset.
+    return: the subdirectory name under DATASETDIR containing all the n_s
+        FMnist OVA datasets created. In the default configuration, that would
+        be
+        ova_fmnist_bc0_rm0.005_s50
     """
-    for i in range(n_col):
-        dn = p_join(DATASETDIR,
-                    f"ova_fmnist_bc{bc}_rm{rm}_s{n_s}_{i}",
-                    DS_SUB_DIR)
-        FMnist(flatten = False).npz_ova_bds(bc, rm, n_s, dn)
+    return gen_data_files(FMnist(flatten = False), "ova_fmnist", bc, rm, n_s)
 
 
-def gen_ds(n_col = 5, bcs = [0, 1], rms = [0.005], n_s = 10):
-    for bc in bcs:
-        for rm in rms:
-            gen_mnist_files(n_col, bc, rm, n_s)
-            gen_fmnist_files(n_col, bc, rm, n_s)
+def gen_small_fmnist_files(bc = 0, rm = 0.01, n_s = 5, tc = 0, ec = 2000):
+    """This generates npz files with FMnist OVA datasets. The generated
+    datasets contain only tc benign digits from the trainings portion and ec
+    benign digits from the evaluation portion of the dataset.
+
+    So the default of bc = 0, rm = 0.01, n_s = 5, tc = 0, ec = 2000, means
+    there will be no benigns from the trainings portion, 2000 benigns from the
+    evaluation portion, so 2000 benigns in total, i.e. 20 maligns, and five
+    such dataset will be created.
+
+    return: the subdirectory name under DATASETDIR containing all the n_s
+        FMnist OVA datasets created. In the default configuration, that would
+        be
+        small_ova_fmnist_bc0_rm0.01_s5
+    """
+    return gen_data_files(FMnist(t_count = tc, e_count = ec, flatten = False),
+                          "small_ova_fmnist", bc, rm, n_s)
+
+
+def gen_ds(bcs = [0, 1]):
+    mnist_dns = [gen_mnist_files(bc) for bc in bcs]
+    fmnist_dns = [gen_fmnist_files(bc) for bc in bcs]
+    return mnist_dns + fmnist_dns
+
+
+def gen_small_ds(bcs = [0, 1]):
+    mnist_dns = [gen_small_mnist_files(bc) for bc in bcs]
+    fmnist_dns = [gen_small_fmnist_files(bc) for bc in bcs]
+    return mnist_dns + fmnist_dns
+
+
+def eval_ds_cols(ds_cols, csv_fn = None, test = False):
+    dt = datetime.now().strftime(DATE_TIME_FORMAT)
+    if csv_fn is None:
+        csv_fn = p_join(DATASETDIR, f"OD_evaluation_{dt}.csv")
+
+    lo_f_df = [cmp_save_potatoes_f(ds_col, test) for ds_col in ds_cols]
+    df_conc = pd.concat([p[1] for p in lo_f_df], ignore_index = True)
+    df_conc.to_csv(csv_fn, index = False)
+
+    return csv_fn
+
+
+def eval_and_plot(ds_cols, test = False):
+    csv_fn = eval_ds_cols(ds_cols, test = test)
+    plot_file(csv_fn, "OD evaluation")
+
+
+def run():
+    ds_cols = gen_ds()
+    eval_and_plot(ds_cols)
+
+
+def run_small():
+    ds_cols = gen_small_ds()
+    eval_and_plot(ds_cols, test = True)
+
+
+###############################################################################
+if __name__ == '__main__':
+    #run_small()
+    run()

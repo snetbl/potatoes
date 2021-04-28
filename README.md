@@ -1,53 +1,56 @@
 # POTATOES
 Below you will find the steps to follow to obtain the results from the paper
 "Anomaly Detection With Partitioning Overfitting Autoencoder Ensembles". This
-has only been tested on ubuntu 18.04, but should work with any anaconda3 and
-tensorflow 2 installation.
+has only been tested on ubuntu 18.04, but should run on any architecture
+supporting anaconda3 and tensorflow 2 installation.
 
 After cloning the repository, you need to make sure that you have the necessary
 libraries installed. We use anaconda3 with tensorflow 2.
 
-First, create randomly a new collection of datasets on which the evaluations
-will later be run. In a shell with the project directory as current working
-directory, call:
+Then, on a command line, change to the project directory, and then type:
 
-$ python -c 'import run; run.gen_ds()'
+    python -c 'import run; run.run()'
 
-this creates a directory tree of datasets under generatedData/.
-For test cases, it is usefull to have a much smaller dataset around. This
-should be created as follows:
+This will first create random datasets from Mnist and FMnist as described in
+the paper: there will be 50 datasets with the digit 0 the inliers and 50
+datasets with the digit 1 the inliers. The same will be done for the FMnist
+dataset taking first class 1 (images of T-shirts/tops), then class 2 (images of
+trousers) as inliers. In total, this will create four different dataset
+collections of 50 datasets each.
+Unless you change the configurations, those dataset collections will be placed
+in the subdirectory `generatedData/datasets`.
 
-$ python -c 'import run; run.gen_small_mnist_files()'
+Next, the above call will apply both a regularized deep convolutional
+autoencoder and a POTATOES model to those datasets, as described in the paper.
+By default, the evaluation results will be saved inside the data collection
+subdirectories next to the data. I.e. if the data for the data collection
+`ova_mnist_bc0_rm0.005_s50` is saved under
 
-Next, the evaluation runs have to be configured. Since there are lots of
-configuration parameters, it doesn't make sense to enter them as function
-arguments, so there is a function template that contains a default
-configuration setting which can easily be changed by changing the code of this
-function. The function is located in the run module and is called
-"conf_cmp_potatoes_f()". It will be called by the other functions below right
-after they start.
-The default configuration in this function is running outlier detection on the
-dataset
-generatedData/datasets/ova_mnist_bc0_rm0.005_s10_0/data/ova_mnist_bc_0_rm0.005_000.npz
-with the models: Isolation Forest, One-Class SVM, regularized Autoencoder, and
-POTATOES. The metrics used are ROC AUC, AP, OF1, and prec@20. All this can be
-changed in this configuration function. The evaluation results are saved under
-generatedData next to the datasets the evaluation was run on.
+    generatedData/datasets/ova_mnist_bc0_rm0.005_s50/data
 
-To actually run the evaluation, type:
+then the belonging evaluation data is saved under
 
-$ python -c 'import run; run.cmp_save_potatoes_f()'
+    generatedData/datasets/ova_mnist_bc0_rm0.005_s50/eval
 
-This can be repeated with as many of the above generated OD datasets as you
-wish, each time changing in the configuration function conf_cmp_potatoes_f()
-the dataset collection to the required new path.
+as `csv` files.
 
-The results are saved as csv files in the "eval" subdirectory of the data
-collection in generatedData/dataset/. After all evaluations have been done,
-those csv files need to be concatenated to one large evaluation file, lets call
-it e.g. "all_evals.csv". Now, to obtain the box plot facets from the paper,
-run:
+Finally, the above call will take the four evaluation files from those four
+dataset collections and plot them as boxplots, so this should look similar to
+the evaluation plots in the paper, although, of course, not exactly like those,
+having used other randomly generated datasets. The combined evaluation data is
+saved in a `csv` file under `generatedData/datasets` together with the
+belonging plot, which is a `pdf` file with the same file name stem.
 
-$ python -c 'import run; run.plot_file("all_evals.csv", "eval summary")'
+The above call then exits. You will need a GPU equipped machine to run this.
+If you just want to check whether everything is properly installed and don't
+want to weight several days for the program to finish, you should call:
 
+    python -c 'import run; run.run_small()'
 
+which does the same as the first call, but with much smaller datasets and only
+very short training. So the results will be useless, this is only for checking
+your setup. It still took about 20 minutes to finish on my desktop machine.
+
+Everything is configurable. Just have a look at the module `run.py`, it mainly
+contains the high level configuration code, so it should be easy to follow and
+adapt.
